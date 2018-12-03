@@ -37,12 +37,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.session.pause()
     }
     
-    func addBox() {
+    func addBox(x: Float = 0, y: Float = 0, z: Float = -0.2) {
         let box = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0)
         
         let boxNode = SCNNode()
         boxNode.geometry = box
-        boxNode.position = SCNVector3(0, 0, -0.2)
+        boxNode.position = SCNVector3(x, y, z)
         
         sceneView.scene.rootNode.addChildNode(boxNode)
     }
@@ -55,8 +55,21 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @objc func didTap(withGestureRecognizer recognizer: UIGestureRecognizer) {
         let tapLocation = recognizer.location(in: sceneView)
         let hitTestResults = sceneView.hitTest(tapLocation)
-        guard let node = hitTestResults.first?.node else { return }
+        guard let node = hitTestResults.first?.node else {
+            let hitTestResultsWithFeaturePoints = sceneView.hitTest(tapLocation, types: .featurePoint)
+            if let hitTestResultWithFeaturePoints = hitTestResultsWithFeaturePoints.first {
+                let translation = hitTestResultWithFeaturePoints.worldTransform.translation
+                addBox(x: translation.x, y: translation.y, z: translation.z)
+            }
+            return
+        }
         node.removeFromParentNode()
     }
 }
 
+extension float4x4 {
+    var translation: float3 {
+        let translation = self.columns.3
+        return float3(translation.x, translation.y, translation.z)
+    }
+}
