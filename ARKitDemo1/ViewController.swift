@@ -17,8 +17,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        sceneView.delegate = self
+        sceneView.allowsCameraControl = false
+        
         addBox()
         addTapGestureToSceneView()
+        #if DEBUG
+        // debug feature
+        sceneView.showsStatistics = true
+        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
+        #endif
     }
 
     override func didReceiveMemoryWarning() {
@@ -59,13 +67,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             let hitTestResultsWithFeaturePoints = sceneView.hitTest(tapLocation, types: .featurePoint)
             if let hitTestResultWithFeaturePoints = hitTestResultsWithFeaturePoints.first {
                 let translation = hitTestResultWithFeaturePoints.worldTransform.translation
+                #if DEBUG
+                print(hitTestResultWithFeaturePoints.worldTransform.columns.3)
+                #endif
                 addBox(x: translation.x, y: translation.y, z: translation.z)
             }
             return
         }
         node.removeFromParentNode()
     }
-}
+
+ }
 
 extension float4x4 {
     var translation: float3 {
