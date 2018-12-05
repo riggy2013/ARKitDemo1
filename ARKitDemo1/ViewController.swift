@@ -20,6 +20,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.delegate = self
         sceneView.allowsCameraControl = false
         
+        configureLighting()
+        
         addBox()
         addTapGestureToSceneView()
         #if DEBUG
@@ -75,6 +77,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             return
         }
         node.removeFromParentNode()
+    }
+    
+    func configureLighting() {
+        sceneView.autoenablesDefaultLighting = true
+        sceneView.automaticallyUpdatesLighting = true
     }
 
  }
